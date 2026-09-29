@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Method;
 
 import rikka.shizuku.Shizuku;
 
@@ -78,12 +79,17 @@ public class MainActivity extends AppCompatActivity {
                 in.close();
                 out.close();
 
-                // Use Shizuku command to copy from cache to Free Fire files directory
+                // Use Shizuku command via reflection to bypass private access restriction in API v13
                 String targetDir = "/data/data/com.dts.freefireth/files/";
-                String cmd = "su -c 'mkdir -p " + targetDir + " && cp " + outFile.getAbsolutePath() + " " + targetDir + filename + " && chmod 777 " + targetDir + filename + "'";
+                String cmd = "mkdir -p " + targetDir + " && cp " + outFile.getAbsolutePath() + " " + targetDir + filename + " && chmod 777 " + targetDir + filename;
                 
-                Process process = Shizuku.newProcess(new String[]{"sh", "-c", cmd}, null, null);
-                process.waitFor();
+                Class<?> shizukuClass = Class.forName("rikka.shizuku.Shizuku");
+                Method newProcessMethod = shizukuClass.getDeclaredMethod("newProcess", String[].class, String[].class, String.class);
+                newProcessMethod.setAccessible(true);
+                Process process = (Process) newProcessMethod.invoke(null, new String[]{"sh", "-c", cmd}, null, null);
+                if (process != null) {
+                    process.waitFor();
+                }
             }
 
             statusText.setText("Injection Successful!\nAssets copied to Free Fire.");

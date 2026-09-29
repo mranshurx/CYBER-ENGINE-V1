@@ -22,15 +22,14 @@ jobs:
     - name: Install Gradle 8.5 manually
       run: |
         wget https://services.gradle.org/distributions/gradle-8.5-bin.zip
-        unzip gradle-8.5-bin.zip
+        unzip -q gradle-8.5-bin.zip
         sudo mv gradle-8.5 /opt/gradle
         echo \/opt/gradle/bin\ >> $GITHUB_PATH
 
-    - name: Verify Gradle Version
-      run: gradle --version
+    - name: Clean Gradle wrapper files to prevent version override
+      run: |
+        rm -rf gradle/wrapper/
+        mkdir -p gradle/wrapper/
 
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
-
-    - name: Build with Gradle
+    - name: Build with Gradle 8.5
       run: gradle assembleDebug

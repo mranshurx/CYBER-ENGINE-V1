@@ -19,17 +19,11 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
-    - name: Install Gradle 8.5 manually
+    - name: Install and Force Gradle 8.5
       run: |
         wget https://services.gradle.org/distributions/gradle-8.5-bin.zip
         unzip -q gradle-8.5-bin.zip
         sudo mv gradle-8.5 /opt/gradle
-        echo \/opt/gradle/bin\ >> $GITHUB_PATH
 
-    - name: Clean Gradle wrapper files to prevent version override
-      run: |
-        rm -rf gradle/wrapper/
-        mkdir -p gradle/wrapper/
-
-    - name: Build with Gradle 8.5
-      run: gradle assembleDebug
+    - name: Build with Absolute Gradle 8.5 Path
+      run: /opt/gradle/bin/gradle assembleDebug
